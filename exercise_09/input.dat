@@ -1,0 +1,34 @@
+30
+0
+1
+1000
+100
+100
+-1
+-1
+2.0
+0.1
+0.1
+0.1
+0.1
+0.75
+
+
+
+
+
+n_cities
+city_type, 0 inside square, 1 on circumference
+world_size, side of the square or radius of the circle
+n_gen
+pop_size
+iprint
+n_mutations if these are negative, use pop_size
+n_crossover
+pick_power
+p_permutation
+p_permutation_chunk
+p_shift
+p_shift_chunk
+p_inversion_chunk
+p_crossover

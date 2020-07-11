@@ -1,0 +1,21 @@
+30
+1
+1
+100
+0.001
+1.5
+1000
+100
+
+
+
+
+
+ReadInput >> n_cities;
+ReadInput >> city_type; 1 circumference, -1 debug (ordered circumference), otherwise square
+ReadInput >> world_size;
+ReadInput >> iprint;
+ReadInput >> t_min;
+ReadInput >> t_max;
+ReadInput >> t_steps;
+ReadInput >> n_mutations;

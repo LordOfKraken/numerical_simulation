@@ -35,6 +35,8 @@ public:
   double Importance(void);
   point Walk(double step);
   point Walk(double step, point p);
+  point Walk_XYZ(double step);
+  point Walk_XYZ(double step, point p);
   point WalkGauss(double mean, double sigma);
 };
 

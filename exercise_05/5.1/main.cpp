@@ -25,16 +25,31 @@ double metropolis(double, double);
 point uniform_step(point, double );
 point normal_step(point, double, double);
 
-double find_step_1s(double , double , double , double ,int);
-double find_step_2p(double , double , double , double ,int);
-point walk_1s(point ,double ,int step_type = 0);
-point walk_2p(point ,double ,int step_type = 0);
 double psi_1s(point);
 double psi_2p(point);
-double rate_1s(int,double,int);
-double rate_2p(int,double,int);
 
-const double a0 = 5.29177E-11;
+// step_type = 0 --> Uniform distribution, move in a cube
+// step_type = 1 --> Normal distribution
+// both steps are centered on the previous position
+
+point walk_1s(point ,double ,int step_type = 0);
+point walk_2p(point ,double ,int step_type = 0);
+
+// run many times, and return the acceptance rate
+double rate_2p(int,double,int);
+double rate_1s(int,double,int);
+
+// run the rate function many times with different steps,
+// using bisection to find the optimal one.
+// the "step" it's the range in which each cartesian cooridinate in uniformly sampled
+double find_step_1s(double , double , double , double ,int);
+double find_step_2p(double , double , double , double ,int);
+// for the normal distribution, the "step" is the standard deviation
+
+
+
+//const double a0 = 5.29177E-11;
+const double a0 = 1;
 Random rnd = rng_load();
 
 int main(int argc, char *argv[])
@@ -44,9 +59,9 @@ int main(int argc, char *argv[])
     cout << "Uniform sampling"<< endl;
     double step_1s = find_step_1s(0.5,5,0.5,0.02,0);
     double step_2p = find_step_2p(0.5,5,0.5,0.02,0);
+    //double step_1s = 1.20;
+    //double step_2p = 3.03;
 
-    //double step_1s = 1.35;
-    //double step_2p = 3.60;
     cout << "Step 1s = " << step_1s << endl;
     cout << "Step 2p = " << step_2p << endl<<endl;
 
@@ -55,7 +70,7 @@ int main(int argc, char *argv[])
     double step_1s_g = find_step_1s(0,2,0.5,0.02,1);
     double step_2p_g = find_step_2p(0,2,0.5,0.02,1);
     //double step_1s_g = 0.75;
-    //double step_sp_g = 1.875;
+    //double step_2p_g = 1.875;
 
     cout << "mu = 0 for both states" << endl;
     cout << "Sigma 1s = " << step_1s_g << endl;
@@ -67,7 +82,7 @@ int main(int argc, char *argv[])
     cout << "Analyze the data to find the equilibration steps required"<<endl<<endl;
 
     // Starting points
-    point p_close = {1,0,0};
+    point p_close = {1,1,1};
     point p_far = {100,100,100};
 
     // First point - Uniform sampling
@@ -82,6 +97,8 @@ int main(int argc, char *argv[])
     point p_2p_close_g = walk_2p(p_close,step_2p_g,1);
     point p_2p_far_g = walk_2p(p_far,step_2p_g,1);
 
+    //point p_1s_close_g = p_close;
+
     // output files
     ofstream out_close("data/r_close.out");
     ofstream out_far("data/r_far.out");
@@ -92,7 +109,9 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
-    for(int i = 0; i < 2000; i++)
+    // equilibration steps
+
+    for(int i = 0; i < 1000; i++)
     {
       p_1s_close=walk_1s(p_1s_close,step_1s);
       p_2p_close=walk_2p(p_2p_close,step_2p);
@@ -100,7 +119,7 @@ int main(int argc, char *argv[])
       p_2p_close_g=walk_2p(p_2p_close_g,step_2p_g,1);
 
       out_close << r(p_1s_close) << " " << r(p_1s_close_g) << " " << r(p_2p_close)<< " " << r(p_2p_close_g) <<endl;
-
+      //out_close << r(p_1s_close_g) << endl;
       p_1s_far=walk_1s(p_1s_far,step_1s);
       p_2p_far=walk_2p(p_2p_far,step_2p);
       p_1s_far_g=walk_1s(p_1s_far_g,step_1s_g,1);
@@ -120,7 +139,7 @@ int main(int argc, char *argv[])
     ofstream out_close_eq("data/r_close_eq.out");
     ofstream out_far_eq("data/r_far_eq.out");
 
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < 2000; i++)
     {
       p_1s_close=walk_1s(p_1s_close,step_1s);
       p_2p_close=walk_2p(p_2p_close,step_2p);
@@ -128,7 +147,7 @@ int main(int argc, char *argv[])
       p_2p_close_g=walk_2p(p_2p_close_g,step_2p_g,1);
 
       out_close_eq << r(p_1s_close) << " " << r(p_1s_close_g) << " " << r(p_2p_close)<< " " << r(p_2p_close_g) <<endl;
-
+      //out_close_eq << r(p_1s_close_g) << endl;
       p_1s_far=walk_1s(p_1s_far,step_1s);
       p_2p_far=walk_2p(p_2p_far,step_2p);
       p_1s_far_g=walk_1s(p_1s_far_g,step_1s_g,1);
@@ -142,8 +161,7 @@ int main(int argc, char *argv[])
 
     // Data blocking
 
-    //int n_throw = 1E6;
-    int block_size = 100;
+    int block_size = 50;
     int n_block =10000;
     int iprint = 1000;
 
@@ -227,7 +245,6 @@ int main(int argc, char *argv[])
       out_r_2p << sum_2p * 1./(j + 1) << " " << error(sum_2p, sum2_2p, j+1) << endl;
       out_r_2p_g << sum_2p_g * 1./(j + 1) << " " << error(sum_2p_g, sum2_2p_g, j+1) << endl;
     }
-
     return 0;
 }
 
@@ -241,49 +258,6 @@ double r(point p)
   return pow(p.x*p.x + p.y*p.y + p.z*p.z,0.5);
 }
 
-double find_step_1s(double s_min, double s_max, double accept_rate, double tolerance,int step_type)
-{
-    double test_step = 0.5*(s_max-s_min);
-    double throws = 1E6;
-    double test_rate = rate_1s(throws,test_step,step_type);
-
-    do{
-      test_step = 0.5*(s_max+s_min);
-      test_rate = rate_1s(throws,test_step,step_type);
-      if(test_rate < accept_rate)
-      {
-        s_max=test_step;
-      }
-      else
-      {
-        s_min = test_step;
-      }
-    }while(abs(test_rate-accept_rate)>tolerance);
-    return test_step;
-}
-
-double find_step_2p(double s_min, double s_max, double accept_rate, double tolerance, int step_type)
-{
-    double test_step = 0.5*(s_max-s_min);
-    double throws = 1E6;
-    double test_rate = rate_2p(throws,test_step,step_type);
-
-    do{
-      test_step = 0.5*(s_max+s_min);
-      test_rate = rate_2p(throws,test_step,step_type);
-
-      if(test_rate < accept_rate)
-      {
-        s_max=test_step;
-      }
-      else
-      {
-        s_min = test_step;
-      }
-    }while(abs(test_rate-accept_rate)>tolerance);
-    return test_step;
-}
-
 point walk_1s(point p_1s,double step,int step_type)
 {
   point p_new;
@@ -291,6 +265,9 @@ point walk_1s(point p_1s,double step,int step_type)
     p_new = normal_step(p_1s,0,step);
   else
     p_new = uniform_step(p_1s,step);
+
+  //cout << "punto ( " << p_1s.x << " , " << p_1s.y << " , " << p_1s.z << " )" << endl;
+  //cout << " " << psi_1s(p_new*a0) << " " << psi_1s(p_1s*a0) << endl;
   if (rnd.Rannyu() <= metropolis(psi_1s(p_new*a0), psi_1s(p_1s*a0)))
   {
     p_1s = p_new;
@@ -301,11 +278,13 @@ point walk_1s(point p_1s,double step,int step_type)
 point walk_2p(point p_2p,double step,int step_type)
 {
   point p_new;
-  if(step_type == 1)
+  if(step_type == 1) //normal distribution
     p_new = normal_step(p_2p,0,step);
-  else
+  else // uniform distribution
     p_new = uniform_step(p_2p,step);
-  if (rnd.Rannyu() <= metropolis(psi_2p(p_new*a0), psi_2p(p_2p*a0)))
+
+  //metropolis check
+  if (rnd.Rannyu() <= metropolis(psi_2p(p_new), psi_2p(p_2p)))
   {
     p_2p = p_new;
   }
@@ -324,7 +303,8 @@ double rate_1s(int throws,double step,int step_type)
       p_new = normal_step(p_1s,0,step);
     else
       p_new = uniform_step(p_1s,step);
-    if (rnd.Rannyu() <= metropolis(psi_1s(p_new*a0), psi_1s(p_1s*a0)))
+    //cout << psi_1s(p_new) << " " << psi_1s(p_1s) << endl;
+    if (rnd.Rannyu() <= metropolis(psi_1s(p_new), psi_1s(p_1s)))
     {
       p_1s = p_new;
       accept++;
@@ -345,7 +325,7 @@ double rate_2p(int throws,double step, int step_type)
       p_new = normal_step(p_2p,0,step);
     else
       p_new = uniform_step(p_2p,step);
-    if (rnd.Rannyu() <= metropolis(psi_2p(p_new*a0), psi_2p(p_2p*a0)))
+    if (rnd.Rannyu() <= metropolis(psi_2p(p_new), psi_2p(p_2p)))
     {
       p_2p = p_new;
       accept++;
@@ -354,9 +334,53 @@ double rate_2p(int throws,double step, int step_type)
   return accept*1./throws;
 }
 
+double find_step_1s(double s_min, double s_max, double accept_rate, double tolerance,int step_type)
+{
+    double test_step = 0.5*(s_max+s_min);
+    double throws = 1E6;
+    double test_rate = rate_1s(throws,test_step,step_type);
+
+    do{
+      test_step = 0.5*(s_max+s_min);
+      test_rate = rate_1s(throws,test_step,step_type);
+      //cout << test_step << " " << test_rate << endl;
+      if(test_rate < accept_rate)
+      {
+        s_max=test_step;
+      }
+      else
+      {
+        s_min = test_step;
+      }
+    }while(abs(test_rate-accept_rate)>tolerance);
+    return test_step;
+}
+
+double find_step_2p(double s_min, double s_max, double accept_rate, double tolerance, int step_type)
+{
+    double test_step = 0.5*(s_max+s_min);
+    double throws = 1E6;
+    double test_rate = rate_2p(throws,test_step,step_type);
+
+    do{
+      test_step = 0.5*(s_max+s_min);
+      test_rate = rate_2p(throws,test_step,step_type);
+
+      if(test_rate < accept_rate)
+      {
+        s_max=test_step;
+      }
+      else
+      {
+        s_min = test_step;
+      }
+    }while(abs(test_rate-accept_rate)>tolerance);
+    return test_step;
+}
+
 point uniform_step(point p, double step)
 {
-  return p + rnd.Walk(step);
+  return p + rnd.Walk_XYZ(step);
 }
 
 point normal_step(point p, double mu, double sigma)
@@ -367,7 +391,8 @@ point normal_step(point p, double mu, double sigma)
 double psi_1s(point p)
 {
   double r = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
-  return pow(a0, -3.) * M_1_PI * exp(-r *2. / a0);
+  //return pow(a0, -3) * M_1_PI * exp(-r *2. / a0);
+  return M_1_PI * exp(-r *2. / a0);
 }
 
 /*****************************************/
@@ -376,8 +401,8 @@ double psi_2p(point p)
 {
   double r = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
   double c_theta = p.z / sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
-  return pow(a0, -5.) * M_1_PI * pow(r,2) * exp(-r / a0) * pow(c_theta,2)/ 32.;
-  //return pow(2. * a0, -5.*0.5) * r * exp(-r / (2. * a0)) * c_theta / sqrt(M_PI);
+  //return pow(a0, -5.) * M_1_PI * pow(r,2) * exp(-r / a0) * pow(c_theta,2)/ 32.;
+  return M_1_PI * pow(r,2) * exp(-r / a0) * pow(c_theta,2)/ 32.;
 }
 
 /***********************************************/

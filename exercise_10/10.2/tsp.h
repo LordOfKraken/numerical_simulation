@@ -63,8 +63,6 @@ double L1(vector<point>,vector<int>);
 double L2(vector<point>,vector<int>);
 vector<point> GenerateCities(int , double, int );
 
-void rng_load();
-
 void Input();
 void SaveCities(vector<point>, string);
 individual GenerateIndividual(vector<point>);

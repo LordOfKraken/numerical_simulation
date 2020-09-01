@@ -19,7 +19,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 using namespace std;
 
 Random rng_load();
-double error(double sum, double sum2, int n);
+double Error(double, double, int);
 
 vector <double> s_lat, s2_lat;
 vector <double> s_con, s2_con;
@@ -39,6 +39,7 @@ int main (int argc, char *argv[])
   double x_con, y_con, z_con;
   double r2_lat, r2_con;
 
+  // contains the sum and sum2 of the distance at each step.
   s_lat.resize(n_step);
   s2_lat.resize(n_step);
   s_con.resize(n_step);
@@ -46,6 +47,7 @@ int main (int argc, char *argv[])
 
   for(int j=0; j< n_walk; j++)
   {
+    // every walk starts from 0
     x_lat=0, y_lat=0, z_lat=0;
     x_con=0, y_con=0, z_con=0;
 
@@ -77,15 +79,19 @@ int main (int argc, char *argv[])
       }
       r2_lat = pow(x_lat*l_lat,2) + pow(y_lat*l_lat,2) + pow(z_lat*l_lat,2);
       s_lat[i] += sqrt(r2_lat);
+      if(j==0)
+        cout << i << " " << sqrt(r2_lat) << " " << s_lat[i] << endl;
       s2_lat[i] += r2_lat;
+      if(j==0)
+        cout << i << " " << r2_lat << " " << s2_lat[i] << endl;
 
       //continuum walk section
-      theta = rnd.Rannyu(0,2.*M_PI);
-      phi = acos(1 - 2.*rnd.Rannyu());
+      phi = rnd.Rannyu(0,2.*M_PI);
+      theta = acos(1 - 2.*rnd.Rannyu());
 
-      x_con += l_con * cos(theta) * sin(phi);
-      y_con += l_con * sin(theta) * sin(phi);
-      z_con += l_con * cos(phi);
+      x_con += l_con * cos(phi) * sin(theta);
+      y_con += l_con * sin(phi) * sin(theta);
+      z_con += l_con * cos(theta);
 
       r2_con = pow(x_con,2) + pow(y_con,2) + pow(z_con,2);
       s_con[i] += sqrt(r2_con);
@@ -94,24 +100,24 @@ int main (int argc, char *argv[])
   }
 
 /********************************
-* Saving to file
+* Saving to file the last simulation
 ********************************/
 
   ofstream l_out("data/lattice.out");
   if (l_out.is_open())
   {
     for (int i = 0; i < n_step; i++)
-      l_out << i + 1 << " " << sqrt(s2_lat[i]/n_walk) << " " << error(s_lat[i] / n_walk, s2_lat[i] / n_walk, i + 1) << endl;
+      l_out << i + 1 << " " << sqrt(s2_lat[i]/n_walk) << " " << Error(s_lat[i], s2_lat[i] , n_walk) << endl;
   }
   else
     cerr <<"Unable to open lattice output file: data saving failed" <<endl;
   l_out.close();
-  
+
   ofstream c_out("data/continuum.out");
   if (c_out.is_open())
   {
     for (int i = 0; i < n_step; i++)
-      c_out << i + 1 << " " << sqrt(s2_con[i]/n_walk) << " " << error(s_con[i] / n_walk, s2_con[i] / n_walk, i + 1) << endl;
+      c_out << i + 1 << " " << sqrt(s2_con[i]/n_walk) << " " << Error(s_con[i] , s2_con[i], n_walk) << endl;
   }
   else
     cerr <<"Unable to open continuum output file: data saving failed" <<endl;
@@ -123,13 +129,9 @@ int main (int argc, char *argv[])
 *   Function implementation
 ***********************************/
 
-double error(double sum, double sum2, int n)
+double Error(double sum, double sum2, int iblk)
 {
-  if (n == 0)
-    return 0;
-
-  else
-    return sqrt((sum2-sum*sum)/n);
+  return sqrt((sum2/iblk - pow(sum/iblk,2))/iblk);
 }
 
 /*********************************/

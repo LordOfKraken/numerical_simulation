@@ -36,6 +36,8 @@ double s[m_spin];
 
 // thermodynamical state
 int nspin;
+double tmin, tmax;
+int tstep;
 double beta,temp,J,h;
 
 // simulation

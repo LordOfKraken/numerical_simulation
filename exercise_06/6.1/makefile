@@ -8,7 +8,6 @@ main.o : main.cpp
 random.o : rng/random.cpp rng/random.h
 	$(CC) -c rng/random.cpp -o random.o $(CFLAGS)
 clean :
-	rm *.o main.x
+	rm *.o main.x *.out
 	rm -rf output.*
-	rm -rf seed.out
 	rm -rf config.final

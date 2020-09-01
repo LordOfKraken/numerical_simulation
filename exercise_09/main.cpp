@@ -165,6 +165,7 @@ void Input(int args){
       n_crossover = pop_size;
     ReadInput >> pick_power;
     ReadInput >> p_permutation;
+    ReadInput >> p_permutation_chunk;
     ReadInput >> p_shift;
     ReadInput >> p_shift_chunk;
     ReadInput >> p_inversion_chunk;
@@ -247,6 +248,7 @@ vector<individual> Mutate(vector<individual> population, int mutation_attempts)
   {
     // pick a (maybe) different individual for each mutation.
     int id_permutation = Select(pick_power,pop_size);
+    int id_permutation_chunk = Select(pick_power,pop_size);
     int id_shift = Select(pick_power,pop_size);
     int id_shift_chunk = Select(pick_power,pop_size);
     int id_inversion_chunk = Select(pick_power,pop_size);
@@ -256,6 +258,10 @@ vector<individual> Mutate(vector<individual> population, int mutation_attempts)
 
     xmen.push_back(Permutation(population[id_permutation],p_permutation));
     if(xmen.back()==population[id_permutation])
+      xmen.pop_back();
+
+    xmen.push_back(PermutationChunk(population[id_permutation_chunk],p_permutation_chunk));
+    if(xmen.back()==population[id_permutation_chunk])
       xmen.pop_back();
 
     xmen.push_back(Shift(population[id_shift],p_shift));
@@ -293,6 +299,47 @@ individual Permutation(individual a, double p)
   new_a.L1=L1(Cities,new_a.city_order);
   new_a.L2=L2(Cities,new_a.city_order);
 
+  return new_a;
+}
+
+individual PermutationChunk(individual a, double p)
+{
+  individual new_a = a;
+  int g1,g2,m;
+  if(rnd.Rannyu() <= p)
+  {
+    //cout << "ShiftChunk "<< endl;
+    g1=rnd.Rannyu(0, a.city_order.size()); // start of the first
+    m=rnd.Rannyu(0, a.city_order.size()*0.5); // length of the chunks
+    g2=rnd.Rannyu(g1+m+1, g1 - m + a.city_order.size()); // start of the second chunk
+    g2 = g2%a.city_order.size();
+
+    for(int i = 0; i < m; i++)
+    {
+      new_a.city_order[(g1+i)%a.city_order.size()] = a.city_order[(g2+i)%a.city_order.size()];
+      new_a.city_order[(g2+i)%a.city_order.size()] = a.city_order[(g1+i)%a.city_order.size()];
+    }
+  }
+
+  int e = CheckIndividual(new_a);
+  if(e!=0)
+  {
+    cout << "PermutationChunk error: " << e << endl;
+    cout << g1 << " " << g2 << " " << m << endl;
+    for(unsigned i = 0; i < a.city_order.size(); i++)
+    {
+      cout << a.city_order[i] << " ";
+    }
+    cout << endl;
+    for(unsigned i = 0; i < new_a.city_order.size(); i++)
+    {
+      cout << new_a.city_order[i] << " ";
+    }
+    cout << endl;
+
+  }
+  new_a.L1=L1(Cities,new_a.city_order);
+  new_a.L2=L2(Cities,new_a.city_order);
   return new_a;
 }
 

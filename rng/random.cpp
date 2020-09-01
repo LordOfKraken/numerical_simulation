@@ -49,6 +49,7 @@ double Random :: Lorentz(double mean, double gamma) {
 
 double Random :: Importance()
 {
+  // Sampling from the inverse CDF of a linear PDF 2*(1-x)
   return 1 + sqrt(1-Rannyu());
 }
 
@@ -68,6 +69,18 @@ point Random :: Walk(double step, point p)
   phi = acos( 1. - 2. * Rannyu());
   point a(step * sin(theta) * cos(phi), step * sin(theta) * sin(phi), step * cos(phi));
   return p+a;
+}
+
+point Random :: Walk_XYZ(double step)
+{
+  point p(Rannyu(-step,step),Rannyu(-step,step),Rannyu(-step,step));
+  return p;
+}
+
+point Random :: Walk_XYZ(double step, point p)
+{
+  point p_new(Rannyu(-step,step),Rannyu(-step,step),Rannyu(-step,step));
+  return p+p_new;
 }
 
 point Random :: WalkGauss(double mean, double sigma) {

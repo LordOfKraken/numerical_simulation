@@ -19,13 +19,13 @@ using namespace std;
 
 // The program will repeat the simulation, changing the temperature in the range given
 
-double tmin = 0.5, tmax=2.0;
-int tstep=51, t=0;
+//double tmin = 0.5, tmax=2.0;
+//int tstep=51, t=0;
 
 int main()
 {
   Input(); //Inizialization
-
+  int t=0;
   while(t <= tstep)
   {
     //fix temperature with 2 decimal digits to solve approximation problem
@@ -74,9 +74,13 @@ void Input(void)
   //Read input informations
   ReadInput.open("input.dat");
 
-  ReadInput >> temp;
+  ReadInput >> tmin;
+  ReadInput >> tmax;
+  ReadInput >> tstep;
+  temp=tmin;
   beta = 1.0/temp;
-  cout << "Temperature = " << temp << endl;
+  cout << "Temperature range = ( " << tmin << " , " << tmax << " )" << endl;
+  cout << "Temperature steps = " << tstep << endl;
 
   ReadInput >> nspin;
   cout << "Number of spins = " << nspin << endl;
@@ -151,6 +155,7 @@ void Move(int metro)
   {
     //Select randomly a particle (for C++ syntax, 0 <= o <= nspin-1)
     o = (int)(rnd.Rannyu()*nspin);
+    // the particle are all identical, so it's enough to sample N times randomly
 
     if(metro==1) //Metropolis
     {

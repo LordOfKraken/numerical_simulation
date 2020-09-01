@@ -147,8 +147,7 @@ void Input(string input_file, string config_path){ //Prepare all stuff for the s
       }
       ReadOldConf.close();
 
-      cout << "Create velocities with Verlet" << endl << endl;
-
+      cout << "Calculate velocities with Verlet" << endl << endl;
       Move();
     }
     else
@@ -172,28 +171,28 @@ void Input(string input_file, string config_path){ //Prepare all stuff for the s
         sumv[2] += vz[i];
     }
 
-      for (int idim=0; idim<3; ++idim) sumv[idim] /= (double)npart;
-      double sumv2 = 0.0, fs;
-      for (int i=0; i<npart; ++i)
-      {
-          vx[i] = vx[i] - sumv[0];
-          vy[i] = vy[i] - sumv[1];
-          vz[i] = vz[i] - sumv[2];
-          sumv2 += vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
-      }
-      sumv2 /= (double)npart;
+    for (int idim=0; idim<3; ++idim) sumv[idim] /= (double)npart;
+    double sumv2 = 0.0, fs;
+    for (int i=0; i<npart; ++i)
+    {
+        vx[i] = vx[i] - sumv[0];
+        vy[i] = vy[i] - sumv[1];
+        vz[i] = vz[i] - sumv[2];
+        sumv2 += vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
+    }
+    sumv2 /= (double)npart;
 
-      fs = sqrt(3 * temp / sumv2);   // fs = velocity scale factor
-      for (int i=0; i<npart; ++i)
-      {
-          vx[i] *= fs;
-          vy[i] *= fs;
-          vz[i] *= fs;
+    fs = sqrt(3 * temp / sumv2);   // fs = velocity scale factor
+    for (int i=0; i<npart; ++i)
+    {
+        vx[i] *= fs;
+        vy[i] *= fs;
+        vz[i] *= fs;
 
-          xold[i] = Pbc(x[i] - vx[i] * delta);
-          yold[i] = Pbc(y[i] - vy[i] * delta);
-          zold[i] = Pbc(z[i] - vz[i] * delta);
-      }
+        xold[i] = Pbc(x[i] - vx[i] * delta);
+        yold[i] = Pbc(y[i] - vy[i] * delta);
+        zold[i] = Pbc(z[i] - vz[i] * delta);
+    }
 
     return;
 }

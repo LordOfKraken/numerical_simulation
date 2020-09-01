@@ -49,7 +49,7 @@ vector<point> Cities;
 
 double pick_power;
 
-double p_shift, p_shift_chunk, p_inversion_chunk, p_permutation;
+double p_shift, p_shift_chunk, p_inversion_chunk, p_permutation, p_permutation_chunk;
 double p_crossover;
 
 int iprint;
@@ -83,6 +83,7 @@ void quicksort_L2(vector<individual> &,int ,int );
 vector<individual> Mutate(vector<individual>,int);
 // possible mutations, every one returns one individual
 individual Permutation(individual,double);
+individual PermutationChunk(individual,double);
 individual Shift(individual,double);
 individual ShiftChunk(individual,double);
 individual InversionChunk(individual,double);

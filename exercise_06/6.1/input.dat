@@ -1,14 +1,18 @@
+0.5
 2.0
+51
 50
 1.0
-0.02
+0.0
 1
 100
 10000
 2000
 0
 
-  ReadInput >> temp;
+  ReadInput >> tmin;
+  ReadInput >> tmax;
+  ReadInput >> tstep;
   ReadInput >> nspin;
   ReadInput >> J;
   ReadInput >> h;

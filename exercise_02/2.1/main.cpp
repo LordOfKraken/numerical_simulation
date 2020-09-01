@@ -71,6 +71,7 @@ void Measure(int n_point)
     sample=rnd.Importance();
     s_uni=rnd.Rannyu();
     walker_u += Integral(s_uni);
+    // divide by the Probability Density Function used
     walker_i += Integral(sample) /(2.0 * (1.0 - sample));
   }
 

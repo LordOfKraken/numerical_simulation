@@ -192,7 +192,7 @@ return 12.*val*val - 5.;
 // to modify its second derivative below!
 double variationalWaveFunction(double v)
 {
-  //return 1.0;/*
+  return 1.0;/*
   double mu = 0.79;
   double sigma = 0.63;
   return exp(- 0.5 * pow((v - mu)/sigma, 2)) + exp(- 0.5 * pow((v + mu)/sigma, 2));
@@ -201,7 +201,7 @@ double variationalWaveFunction(double v)
 
 double variationalWaveFunction_second(double v)
 {
-  //return 0;/*
+  return 0;/*
   double mu = 0.79;
   double sigma = 0.63;
   return exp(- 0.5 * pow((v - mu)/sigma, 2)) * (mu * mu - sigma * sigma + v * v - 2 * mu * v) / pow(sigma, 4) +
